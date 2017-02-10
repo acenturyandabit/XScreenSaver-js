@@ -5,4 +5,4 @@ The beginning of a series of XScreenSaver hacks implemented in Javascript.
 
 * Unknown Pleasures
 
-![UnknownPleasures](UnknownPleasures.gif)
+![UnknownPleasures](UnknownPleasuresPreview.gif)
