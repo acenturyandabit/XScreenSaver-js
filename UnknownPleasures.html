@@ -1,0 +1,120 @@
+<!DOCTYPE HTML>
+<!-- UnknownPleasures -->
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+          background-color:#000;
+      }
+
+    </style>
+  </head>
+  <body>
+    <canvas id="myCanvas" style="background-color:#000"></canvas>
+    <script>
+      function Graph(config) {
+        this.canvas = document.getElementById(config.canvasId);
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+        this.minX = config.minX;
+        this.minY = config.minY;
+        this.maxX = config.maxX;
+        this.maxY = config.maxY;
+
+        this.context = this.canvas.getContext('2d');
+        this.rangeX = this.maxX - this.minX;
+        this.rangeY = this.maxY - this.minY;
+        this.centerY = Math.round(Math.abs(this.minY / this.rangeY) * this.canvas.height);
+        this.centerX = Math.round(Math.abs(this.minX / this.rangeX) * this.canvas.width);
+        this.iteration = (this.maxX - this.minX) / 150;
+        this.scaleX = this.canvas.width / this.rangeX;
+        this.scaleY = this.canvas.height / this.rangeY;
+      }
+
+
+      Graph.prototype.drawEquation = function(equation, color, thickness) {
+        var context = this.context;
+        context.save();
+        context.save();
+        this.transformContext();
+
+        context.beginPath();
+        context.moveTo(this.minX, equation(this.minX));
+
+        for(var x = this.minX + this.iteration; x <= this.maxX; x += this.iteration) {
+          context.lineTo(x, equation(x));
+        }
+
+        context.restore();
+        context.lineJoin = 'round';
+        context.lineWidth = thickness;
+        context.fillStyle = 'black';
+        context.fill();
+        context.strokeStyle = 'white';
+        context.stroke();
+        context.restore();
+      };
+
+      Graph.prototype.clear = function() {
+        var context = this.context;
+        context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      }
+
+      Graph.prototype.transformContext = function() {
+        var context = this.context;
+
+        // move context to center of canvas
+        this.context.translate(this.centerX, this.centerY);
+        context.scale(this.scaleX, -this.scaleY);
+      };
+      var myGraph = new Graph({
+        canvasId: 'myCanvas',
+        minX: -50,
+        minY: 0,
+        maxX: 150,
+        maxY: 1040,
+      });
+
+      var Sum = function(f, n1, n2) {
+	var ret = 0;
+	for(var i=n1;i<n2;i++){
+	  ret += f(i);
+	}
+        return ret; 
+      }
+      var R = function(n) {
+        var x = Math.sin(n) * 10002;
+        return x - Math.floor(x);
+      }
+
+      var line = function(x) {
+        var r = 0
+          + 0.2 * Math.sin(2 * Math.PI * R(6 * m)
+            + Sum(function(n){return 4
+            * Math.sin(2 * Math.PI * R(4*m) + t + R(2 * n * m) * 2 * Math.PI)
+            * Math.exp(-Math.pow(0.3*x + 30 - 1 * 85 * R(2 * n * m),2)/20)}, 1, 20))
+          + Sum(function(n){return 3*(1 + R(3*n*m))*Math.abs(Math.sin(t+R(n*m)*2*Math.PI)) 
+            * Math.exp(-Math.pow(x-1*100*R(n*m),2)/20)},1,4)
+        r = -80 + -12*m + 12*r;
+        return r;
+      }
+
+
+      var t = 0.0;
+      var m = 1;
+      var runner = function() {
+        //t = (t+ (6.3/19))%(6.3*18/19);
+        t = (t+0.2)%Math.PI;
+        myGraph.clear();
+        for(m=1;m<80;m+=1){
+          myGraph.drawEquation(line, 'black', 2.5);
+        }
+      }
+
+      var t=setInterval(runner,33);
+    </script>
+  </body>
+</html>
+      
