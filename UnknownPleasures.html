@@ -1,5 +1,6 @@
 <!DOCTYPE HTML>
 <!-- UnknownPleasures -->
+<!-- Based off of: http://intothecontinuum.tumblr.com/post/27443100682/in-july-1967-astronomers-at-the-cavendish -->
 <html>
   <head>
     <style>
@@ -12,17 +13,19 @@
     </style>
   </head>
   <body>
-    <canvas id="myCanvas" style="background-color:#000"></canvas>
+    <canvas id="myCanvas" style="background-color:#000;padding:2% 32%;"></canvas>
     <script>
       function Graph(config) {
+        // user defined properties
         this.canvas = document.getElementById(config.canvasId);
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
+        this.canvas.width = window.innerWidth * 0.36;
+        this.canvas.height = window.innerHeight * 0.9;
         this.minX = config.minX;
         this.minY = config.minY;
         this.maxX = config.maxX;
         this.maxY = config.maxY;
 
+        // relationships
         this.context = this.canvas.getContext('2d');
         this.rangeX = this.maxX - this.minX;
         this.rangeY = this.maxY - this.minY;
@@ -106,7 +109,7 @@
       var m = 1;
       var runner = function() {
         //t = (t+ (6.3/19))%(6.3*18/19);
-        t = (t+0.2)%Math.PI;
+        t = (t+0.1)%Math.PI;
         myGraph.clear();
         for(m=1;m<80;m+=1){
           myGraph.drawEquation(line, 'black', 2.5);
@@ -115,6 +118,8 @@
 
       var t=setInterval(runner,33);
     </script>
+<
   </body>
 </html>
       
+
