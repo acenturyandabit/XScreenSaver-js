@@ -3,8 +3,9 @@
 <!-- Based off of: http://intothecontinuum.tumblr.com/post/27443100682/in-july-1967-astronomers-at-the-cavendish -->
 <html>
   <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.2/dat.gui.min.js"></script>
     <style>
-      body {
+      html,body {
         margin: 0px;
         padding: 0px;
           background-color:#000;
@@ -13,13 +14,19 @@
     </style>
   </head>
   <body>
-    <canvas id="myCanvas" style="background-color:#000;padding:2% 32%;"></canvas>
+    <canvas id="myCanvas"></canvas>
     <script>
       function Graph(config) {
+        this.configure(config);
+      }
+
+      Graph.prototype.configure = function(config) {
         // user defined properties
         this.canvas = document.getElementById(config.canvasId);
-        this.canvas.width = window.innerWidth * 0.36;
-        this.canvas.height = window.innerHeight * 0.9;
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight-10;
+        this.targetWidth = window.innerWidth * 0.36;
+        this.targetHeight = window.innerHeight * 0.9;
         this.minX = config.minX;
         this.minY = config.minY;
         this.maxX = config.maxX;
@@ -29,55 +36,52 @@
         this.context = this.canvas.getContext('2d');
         this.rangeX = this.maxX - this.minX;
         this.rangeY = this.maxY - this.minY;
-        this.centerY = Math.round(Math.abs(this.minY / this.rangeY) * this.canvas.height);
-        this.centerX = Math.round(Math.abs(this.minX / this.rangeX) * this.canvas.width);
-        this.iteration = (this.maxX - this.minX) / 150;
-        this.scaleX = this.canvas.width / this.rangeX;
-        this.scaleY = this.canvas.height / this.rangeY;
+        this.offsetX = (this.canvas.width - this.targetWidth)/2;
+        this.offsetY = (this.canvas.height - this.targetHeight);// /2;
+        this.centerY = Math.round(Math.abs(this.minY / this.rangeY) * this.targetHeight + this.offsetY);
+        this.centerX = Math.round(Math.abs(this.minX / this.rangeX) * this.targetWidth + this.offsetX);
+        this.iteration = (this.maxX - this.minX);
+        this.scaleX = this.targetWidth / this.rangeX;
+        this.scaleY = this.targetHeight / this.rangeY;
       }
 
 
-      Graph.prototype.drawEquation = function(equation, color, thickness) {
+      Graph.prototype.drawEquation = function(equation, config) {
         var context = this.context;
         context.save();
         context.save();
-        this.transformContext();
-
+        context.translate(this.centerX, this.centerY);
+        context.scale(this.scaleX,-this.scaleY);
         context.beginPath();
-        context.moveTo(this.minX, equation(this.minX));
 
-        for(var x = this.minX + this.iteration; x <= this.maxX; x += this.iteration) {
-          context.lineTo(x, equation(x));
+        context.moveTo( this.minX, equation(this.minX,config));
+        for(var x = this.minX + this.iteration/config.resolution; 
+            x <= this.maxX; x += this.iteration/config.resolution) {
+          context.lineTo( x, equation(x,config));
         }
 
         context.restore();
         context.lineJoin = 'round';
-        context.lineWidth = thickness;
-        context.fillStyle = 'black';
+        context.lineWidth = config.thickness;
+        context.fillStyle = config.background;
         context.fill();
-        context.strokeStyle = 'white';
+        context.strokeStyle = config.foreground;
         context.stroke();
         context.restore();
       };
 
-      Graph.prototype.clear = function() {
+      Graph.prototype.clear = function(config) {
         var context = this.context;
+        this.canvas.style.backgroundColor = config.background;
         context.clearRect(0, 0, this.canvas.width, this.canvas.height);
       }
 
-      Graph.prototype.transformContext = function() {
-        var context = this.context;
-
-        // move context to center of canvas
-        this.context.translate(this.centerX, this.centerY);
-        context.scale(this.scaleX, -this.scaleY);
-      };
       var myGraph = new Graph({
         canvasId: 'myCanvas',
         minX: -50,
         minY: 0,
         maxX: 150,
-        maxY: 1040,
+        maxY: 1000,
       });
 
       var Sum = function(f, n1, n2) {
@@ -92,34 +96,54 @@
         return x - Math.floor(x);
       }
 
-      var line = function(x) {
+      var line = function(x,config) {
         var r = 0
-          + 0.2 * Math.sin(2 * Math.PI * R(6 * m)
+          + config.flat * Math.sin(2 * Math.PI * R(6 * m)
             + Sum(function(n){return 4
             * Math.sin(2 * Math.PI * R(4*m) + t + R(2 * n * m) * 2 * Math.PI)
             * Math.exp(-Math.pow(0.3*x + 30 - 1 * 85 * R(2 * n * m),2)/20)}, 1, 20))
-          + Sum(function(n){return 3*(1 + R(3*n*m))*Math.abs(Math.sin(t+R(n*m)*2*Math.PI)) 
+          + config.height * Sum(function(n){return 3*(1 + R(3*n*m))*Math.abs(Math.sin(t+R(n*m)*2*Math.PI)) 
             * Math.exp(-Math.pow(x-1*100*R(n*m),2)/20)},1,4)
-        r = -80 + -12*m + 12*r;
+        r = r - config.lineheight*m;
         return r;
       }
 
 
       var t = 0.0;
       var m = 1;
+      var config = {
+        height: 12,
+        lineheight: 12,
+        thickness: 2.5,
+        flat: 1.5,
+        background: '#000000',
+        foreground: '#ffffff',
+        resolution: 100,
+        speed: 0.1,
+      };
+
       var runner = function() {
         //t = (t+ (6.3/19))%(6.3*18/19);
-        t = (t+0.1)%Math.PI;
-        myGraph.clear();
+        t = (t+config.speed)%Math.PI;
+        myGraph.clear(config);
         for(m=1;m<80;m+=1){
-          myGraph.drawEquation(line, 'black', 2.5);
+          myGraph.drawEquation(line,config);
         }
       }
 
-      var t=setInterval(runner,33);
+    window.onload = function() {
+      var gui = new dat.GUI();
+      gui.add(config, 'thickness', 0.2, 5);
+      gui.add(config, 'height',0,20);
+      gui.add(config, 'flat',0,4);
+      gui.add(config, 'resolution',1,200);
+      gui.add(config, 'speed',0,0.2);
+      gui.addColor(config, 'background');
+      gui.addColor(config, 'foreground');
+    };
+
+    var t=setInterval(runner,33);
+
     </script>
-<
   </body>
 </html>
-      
-
