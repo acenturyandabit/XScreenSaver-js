@@ -6,3 +6,7 @@ The beginning of a series of XScreenSaver hacks implemented in Javascript.
 * Unknown Pleasures
 
 ![UnknownPleasures](UnknownPleasuresPreview.gif)
+
+* Coral
+
+![UnknownPleasures](Coral.gif)
