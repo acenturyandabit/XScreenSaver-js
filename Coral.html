@@ -23,6 +23,22 @@
         return r;
       }
 
+      function shuffleArray(array) {
+	  for (var i = array.length - 1; i > 0; i--) {
+	      var j = Math.floor(Math.random() * (i + 1));
+	      var temp = array[i];
+	      array[i] = array[j];
+	      array[j] = temp;
+	  }
+	  return array;
+      }
+
+      function transition(index,p,n,c) {
+        var r = 0;
+        var x = Math.floor((n-1) * 0.99999999*(1-p)); 
+        var np = (0.99999999*p*(n-1))%1;
+	return Math.floor(c[x][index]*np + c[x+1][index]*(1-np));
+      }
 
       Hack.prototype.clear = function(config) {
         var context = this.context;
@@ -59,25 +75,47 @@
         */
 
         this.context.fillStyle = "rgba("+
-          (Math.floor(this.nwalkers*255/this.maxwalkers))+","+
-          255+","+
-          (255-Math.floor(this.nwalkers*255/this.maxwalkers))+","+
+          transition(0,this.nwalkers/this.maxwalkers,this.ncolors,this.colors)+","+
+          transition(1,this.nwalkers/this.maxwalkers,this.ncolors,this.colors)+","+
+          transition(2,this.nwalkers/this.maxwalkers,this.ncolors,this.colors)+","+
           (255/255)+")";
-        var pixel = this.config.pixel;
-        this.context.fillRect( pixel*x, pixel*y, pixel, pixel );
+        this.context.fillRect( this.pixel*x, this.pixel*y, this.pixel, this.pixel );
       }
 
-      Hack.prototype.configure = function() {
+      Hack.prototype.restart = function() {
         config = this.config;
         this.canvas = document.getElementById(config.canvasId);
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight-4;
-        this.width = config.width;
-        this.height = config.height;
+
+        // TODO: Figure out bug affecting pixel=2 value (diagonal lines)
+        this.pixel = this.config.pixel;
+        if(this.pixel==2){this.pixel=2.02;}
+        this.height = Math.floor(this.canvas.height/this.pixel);
+        this.width = Math.floor(this.canvas.width/this.pixel);
+
         this.context = this.canvas.getContext('2d');
-        this.scaleX = this.canvas.width / this.width;
-        this.scaleY = this.canvas.height / this.height;
+        this.scaleX = Math.floor(this.canvas.width / this.width);
+        this.scaleY = Math.floor(this.canvas.height / this.height);
         
+        // Colors
+	this.ncolors = config.colors;
+        this.colors = []
+	for(var i=0;i<this.ncolors;i++){
+          a1 = R(256);
+          a2 = R(256);
+          a3 = Math.floor(255 - (a1+a2)/2);
+          this.colors[i] = shuffleArray([a1,a2,a3]);
+	}
+        if(this.ncolors==1) { this.colors[1]=this.colors[0]; }
+
+        // Density
+        this.nwalkers = Math.floor(this.width*this.height*config.density/100);
+        this.maxwalkers = this.nwalkers;
+        this.walkers = [];
+        for( var i = 0; i < this.nwalkers; i++ ) {
+          this.walkers[i] = {x: R(this.width), y: R(this.height)};
+        }
 
         this.cells = [];
         for (var i=0; i<(1+Math.floor(config.height*config.width)/32); i++) {
@@ -87,7 +125,7 @@
           //}
         }
 
-	this.seeds = 100;
+	this.seeds = config.seeds;
 	for( var i = 0; i < this.seeds; i++ ) {
 	    var x, y;
 	    do {
@@ -102,20 +140,7 @@
 	}
 
 
-        this.nwalkers = Math.floor(this.width*this.height*30/100);
-        this.maxwalkers = this.nwalkers;
-        this.walkers = [];
-        for( var i = 0; i < this.nwalkers; i++ ) {
-          this.walkers[i] = {x: R(this.width), y: R(this.height)};
-        }
-        this.ncolors=1;
-        this.npoints = 0;
-        //this.max_points = 10;
-        //this.pointsbuf = [];
-        //for (var i=0; i<this.max_points+2; i++) {
-        //  this.pointsbuf[i]={x:0,y:0};
-        //}
-        this.colorsloth = this.nwalkers*2/this.ncolors;
+
         this.clear(config);
 
 
@@ -123,19 +148,17 @@
 
       function Hack(config) {
         this.config = config;
-        this.configure();
+        this.restart();
       }
 
 
 
       var t = 0.0;
       var m = 1;
-      var config = {
-      };
 
       var runner = function() {
         if(hack.nwalkers==0) {
-          hack.configure();
+          hack.restart();
           return;
         }
         var i = 0;
@@ -186,18 +209,25 @@
         }
       }
 
-    window.onload = function() {
-      var gui = new dat.GUI();
-    };
-
       var options = {
         canvasId: 'myCanvas',
-        pixel: 2,
+        pixel: 3,
+        colors: 3,
+        density: 30,
+        seeds: 20,
       }
-      options.height = Math.floor((window.innerHeight-4)/options.pixel);
-      options.width = Math.floor((window.innerWidth-4)/options.pixel);
 
       var hack = new Hack(options);
+
+      window.onload = function() {
+        var gui = new dat.GUI();
+        gui.add(options, 'pixel', 1, 10).step(1);
+        gui.add(options, 'colors', 1, 10).step(1);
+        gui.add(options, 'density', 1, 100);
+        gui.add(options, 'seeds', 1, 100);
+        gui.add(hack, 'restart');
+      };
+
 
 
     var t=setInterval(runner,33);
