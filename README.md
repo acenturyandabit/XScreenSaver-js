@@ -22,7 +22,7 @@ Simulates coral growth.
 
 Original author: Frederick Roeber; 1997.
 
-![Coral](Coral.gif)
+![Coral](CoralPreview.gif)
 
 
 
@@ -32,5 +32,9 @@ Original author: Frederick Roeber; 1997.
 Generates random mountain ranges using iterative subdivision of triangles.
 
 Original author: Tobias Gloth; 1997.
+
+The colour-selection algorithm isn't implemented properly yet.
+
+(Note: The slow framerate in the gif is due to the screen-capturing program)
 
 ![UnknownPleasures](Triangle.gif)
