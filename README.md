@@ -22,4 +22,15 @@ Simulates coral growth.
 
 Original author: Frederick Roeber; 1997.
 
-![UnknownPleasures](Coral.gif)
+![Coral](Coral.gif)
+
+
+
+
+### Triangle
+
+Generates random mountain ranges using iterative subdivision of triangles.
+
+Original author: Tobias Gloth; 1997.
+
+![UnknownPleasures](Triangle.gif)
