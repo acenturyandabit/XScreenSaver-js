@@ -29,11 +29,13 @@ Original author: Frederick Roeber; 1997.
 
 ### Triangle
 
+[Live preview](http://***REMOVED***.com/app/XScreenSaver.js/Triangle.html)
+
 Generates random mountain ranges using iterative subdivision of triangles.
 
 Original author: Tobias Gloth; 1997.
 
-The colour-selection algorithm isn't implemented properly yet.
+The colour-selection algorithm isn't implemented properly yet. There are a few other bugs.
 
 (Note: The slow framerate in the gif is due to the screen-capturing program)
 
