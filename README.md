@@ -9,7 +9,7 @@ The beginning of a series of XScreenSaver hacks implemented in Javascript.
 
 Original author: Jamie Zawinski; 2013.
 
-![UnknownPleasures](UnknownPleasuresPreview.gif)
+![UnknownPleasures](previews/UnknownPleasuresPreview.gif)
 
 
 
@@ -22,7 +22,7 @@ Simulates coral growth.
 
 Original author: Frederick Roeber; 1997.
 
-![Coral](CoralPreview.gif)
+![Coral](previews/CoralPreview.gif)
 
 
 
@@ -35,8 +35,6 @@ Generates random mountain ranges using iterative subdivision of triangles.
 
 Original author: Tobias Gloth; 1997.
 
-The colour-selection algorithm isn't implemented properly yet. There are a few other bugs.
-
 (Note: The slow framerate in the gif is due to the screen-capturing program)
 
-![UnknownPleasures](Triangle.gif)
+![UnknownPleasures](previews/Triangle.gif)

@@ -117,48 +117,60 @@
       
       var triangles = [];
 
+      var centroid = function(p) {
+        return new point( (p[0].x+p[1].x+p[2].x)/3, (p[0].y+p[1].y+p[2].y)/3); 
+      }
+
+      var v_minus = function(p1,p2) {
+        return new point(p1.x - p2.x,p1.y-p2.y);
+      }
+
+      var scale_triangle = function(p,add) {
+        var curr_centroid = centroid(p);
+        for(var i =0; i<p.length;i++) {
+          var diff = v_minus(p[i],curr_centroid);
+          var d_size = Math.sqrt(diff.x*diff.x+diff.y*diff.y);
+          diff.x /= d_size; diff.y /= d_size;
+          diff.x *= add; diff.y *= add;
+          p[i].x+=diff.x; p[i].y+=diff.y;
+        }
+        return p; // arrays passed by ref or val?
+      }
 
       Hack.prototype.draw_atriangle = function(p,ys,dinv) {
         var dmin = Math.min(ys[0],ys[1],ys[2]);
         var dmax = Math.max(ys[0],ys[1],ys[2]);
         var colorindex;
-        var ncolors = 4;
         var color;
 
         if(dmax==0) {
-          colorindex = ncolors-1;
+          colorindex = this.ncolors-1;
         } else {
-          colorindex = Math.floor(ncolors -
-                    (ncolors / (Math.PI/2) * Math.atan(dinv * (dmax - dmin))));
+          //console.log(Math.atan(dmax/10)/(Math.PI/2));
+          colorindex = Math.floor(
+                    (this.ncolors / (Math.PI/2) * Math.atan(dinv * (dmax - dmin))));
         }
-        color = this.colors[colorindex % ncolors];
-        if(colorindex<9) {
-        console.log(colorindex +": "+color);
-        }
+        color = this.colors[colorindex];
         //console.log(dmax - dmin);
         //console.log((ncolors/(2*Math.PI)) * Math.atan(dinv * (dmax - dmin)));
+        
+        // attempt to remove black lines between triangles
+        // resizes triangle if not of background colour
+        if((colorindex!=this.ncolors-1) && (p[0].y < (tri.ypos[0]))) {
+          p = scale_triangle(p,1.2);
+        }
 
         this.context.beginPath();
         this.context.moveTo(p[0].x,p[0].y+this.offset);
         this.context.lineTo(p[1].x,p[1].y+this.offset);
         this.context.lineTo(p[2].x,p[2].y+this.offset);
-        if(colorindex==ncolors-1) {
           this.context.fillStyle="rgb("+
-                                      ((color[0])%255)
+                                      ((Math.round(color[0])))
                                       +","+
-                                      ((color[1])%255)
+                                      ((Math.round(color[1])))
                                       +","+
-                                      ((color[2])%255)
+                                      ((Math.round(color[2])))
                                       +")";
-            } else {
-        this.context.fillStyle="rgb("+
-                                      (Math.min(color[0]+R(30),255))
-                                      +","+
-                                      (Math.min(color[1]+R(30),255))
-                                      +","+
-                                      (Math.min(color[2]+R(30),255))
-                                      +")";
-            }
         this.context.fill();
 
       }
@@ -213,6 +225,7 @@
           this.context.fillRect(x,y,x2-x,y2-y+this.offset);
 	}
 	for (; (tri.j < tri.size) && (count > 0); tri.j += ((count) ? d : 0)) {
+    if(tri.stage==-1) {tri.init_now = 1; break;}
 		for (tri.i = (first) ? tri.i : 0, first = 0;
 		     (tri.i < MAX_SIZE - tri.j) && (count > 0);
 		     tri.i += d, count--) {
@@ -233,7 +246,7 @@
       }
 
       Hack.prototype.init_colors = function() {
-	this.ncolors = 4;
+        this.ncolors = this.config.ncolors;
         this.colors = [];
 
         // Color 1
@@ -259,7 +272,7 @@
             trans(i/(this.ncolors-1),c1[2],c2[2]),
             ];
 	}
-        console.log(this.colors);
+        //console.log(this.colors);
         //if(this.ncolors==1) { this.colors[1]=this.colors[0]; }
       }
 
@@ -376,6 +389,10 @@ Hack.prototype.draw_triangle = function() {
   }
 }
 
+      Hack.prototype.restart = function() {
+            this.tri.stage = -1;
+      }
+
 
 
       Hack.prototype.clear = function() {
@@ -412,13 +429,17 @@ Hack.prototype.draw_triangle = function() {
 
       var options = {
         canvasId: 'myCanvas',
+        ncolors: 128,
       }
 
       var hack = new Hack(options);
       hack.init_triangle();
 
+      var gui;
       window.onload = function() {
-        var gui = new dat.GUI();
+        gui = new dat.GUI();
+        gui.add(options, 'ncolors', 1, 128).step(1).name("# of colours");
+        gui.add(hack, 'restart').name('Restart');
       };
 
       var t=setInterval(hack.run,33);
