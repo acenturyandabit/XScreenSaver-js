@@ -38,3 +38,16 @@ Original author: Tobias Gloth; 1997.
 (Note: The slow framerate in the gif is due to the screen-capturing program)
 
 ![UnknownPleasures](previews/Triangle.gif)
+
+
+
+
+### Rorschach
+
+[Live preview](http://***REMOVED***.com/app/XScreenSaver.js/Rorschach.html)
+
+[Inkblot patterns](https://en.wikipedia.org/wiki/Rorschach_test) via a reflected [random walk](https://en.wikipedia.org/wiki/Random_walk).
+
+Original author: Jamie Zawinski; 1992.
+
+![Rorschach](previews/Rorschach.gif)
