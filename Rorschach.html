@@ -1,16 +1,16 @@
 <!DOCTYPE HTML>
 <!-- Rorschach.html -->
 
-
 <html>
   <head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.2/dat.gui.min.js"></script>
     <title>Rorschach</title>
     <style>
+
       html,body {
         margin: 0px;
         padding: 0px;
-          background-color:#000;
+        background-color:#000;
       }
 
     </style>
@@ -37,6 +37,7 @@
 			 *           eraser.
 			 */
 
+      // Options for dat.gui
       var options = {
         pixel: 1,
         background: "#000000",
@@ -59,6 +60,7 @@
         gui.addColor(options, 'background').name("Background");
       }
 
+      // setup(config) runs everytime the animation is restarted
       Hack.prototype.setup = function(config) {
         // clearInterval(hack.interval);
 
@@ -87,13 +89,13 @@
 
         this.current_x = this.xlim/2;
         this.current_y = this.ylim/2;
-
-        // 30 FPS
       }
 
+      // Runs 30 times a second
       Hack.prototype.loop = function() {
         this.update_fps();
 
+        // Number of dots to add this iteration
         var iter_chunk = this.config.speed * 3;
         var points = [];
         var x = this.current_x;
@@ -104,19 +106,28 @@
           points[i] = new point(0,0);
         }
 
+        // Don't go over target # of points
         var this_iterations = iter_chunk;
         if (this_iterations > this.remaining_iterations) {
           this_iterations = this.remaining_iterations;
         }
 
+        // Draw a dot and move
         for (i = 0; i < this_iterations; i++) {
+
+          // Moving logic
           x += (R(1 + (this.offset << 1))) - this.offset;
           y += (R(1 + (this.offset << 1))) - this.offset;
+
+          // Allow dot to go outside screen by 100 pixels
           x = Math.max(-100,x); x = Math.min(this.width+100,x);
           y = Math.max(-100,y); y = Math.min(this.height+100,y);
+
           points[j].x = x;
           points[j].y = y;
           j++;
+
+          // Symmetries
           if(this.xsym) {
             points[j].x = this.xlim - x;
             points[j].y = y;
@@ -150,7 +161,7 @@
 
 
       // Hack-general functions
-
+      // TODO: Consider moving to seperate file for reuse
       var R = function(n) {
         var r = Math.floor(Math.random() * n);
         return r;
@@ -182,6 +193,7 @@
       }
 
 
+      // Also consider moving to seperate file
 
       Hack.prototype.default_configure = function(config) {
         this.canvas = document.getElementById('myCanvas');
@@ -237,6 +249,8 @@
       var gui;
       window.onload = function() {
         hack = new Hack(options);
+
+        // dat.GUI adds the menu to control options
         gui = new dat.GUI();
         gui.close();
         document.getElementsByClassName("close-button")[0].innerText = "Open Controls (H to hide)" 

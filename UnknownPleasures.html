@@ -20,6 +20,7 @@
         this.configure(config);
       }
 
+      // Runs every time animation restarts
       Graph.prototype.configure = function(config) {
         // user defined properties
         this.canvas = document.getElementById(config.canvasId);
@@ -46,6 +47,7 @@
       }
 
 
+      // Draws each of the lines
       Graph.prototype.drawEquation = function(equation, config) {
         var context = this.context;
         context.save();
@@ -84,13 +86,16 @@
         maxY: 1000,
       });
 
+
+      // Some general functions
       var Sum = function(f, n1, n2) {
-	var ret = 0;
-	for(var i=n1;i<n2;i++){
-	  ret += f(i);
-	}
+        var ret = 0;
+        for(var i=n1;i<n2;i++){
+          ret += f(i);
+        }
         return ret; 
       }
+
       var R = function(n) {
         var x = Math.sin(n) * 10002;
         return x - Math.floor(x);
@@ -111,6 +116,7 @@
 
       var t = 0.0;
       var m = 1;
+      // Settings configurable through dat.GUI
       var config = {
         height: 12,
         lineheight: 12,
@@ -122,6 +128,7 @@
         speed: 0.1,
       };
 
+      // Runs 30 times a second
       var runner = function() {
         //t = (t+ (6.3/19))%(6.3*18/19);
         t = (t+config.speed)%Math.PI;
@@ -131,18 +138,18 @@
         }
       }
 
-    window.onload = function() {
-      var gui = new dat.GUI();
-      gui.add(config, 'thickness', 0.2, 5);
-      gui.add(config, 'height',0,20);
-      gui.add(config, 'flat',0,4);
-      gui.add(config, 'resolution',1,200);
-      gui.add(config, 'speed',0,0.2);
-      gui.addColor(config, 'background');
-      gui.addColor(config, 'foreground');
-    };
+      window.onload = function() {
+        var gui = new dat.GUI();
+        gui.add(config, 'thickness', 0.2, 5);
+        gui.add(config, 'height',0,20);
+        gui.add(config, 'flat',0,4);
+        gui.add(config, 'resolution',1,200);
+        gui.add(config, 'speed',0,0.2);
+        gui.addColor(config, 'background');
+        gui.addColor(config, 'foreground');
+      };
 
-    var t=setInterval(runner,33);
+      var t=setInterval(runner,33);
 
     </script>
   </body>

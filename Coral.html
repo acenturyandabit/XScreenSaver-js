@@ -34,19 +34,23 @@
        * implied warranty.
        */
 
+      // General functions (todo: move to general file)
+
+      // Random number between 0,n
       var R = function(n) {
         var r = Math.floor(Math.random() * n);
         return r;
       }
 
+      // Shuffle array
       function shuffleArray(array) {
-	  for (var i = array.length - 1; i > 0; i--) {
-	      var j = Math.floor(Math.random() * (i + 1));
-	      var temp = array[i];
-	      array[i] = array[j];
-	      array[j] = temp;
-	  }
-	  return array;
+        for (var i = array.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var temp = array[i];
+          array[i] = array[j];
+          array[j] = temp;
+        }
+        return array;
       }
 
       function transition(index,p,n,c) {
@@ -54,9 +58,10 @@
         var r = 0;
         var x = Math.floor((n-1) * 0.99999999*(1-p)); 
         var np = (0.99999999*p*(n-1))%1;
-	return Math.floor(c[x][index]*np + c[x+1][index]*(1-np));
+        return Math.floor(c[x][index]*np + c[x+1][index]*(1-np));
       }
 
+      // Arrays of pixels for tracking state
       Hack.prototype.getPixel = function(x,y) {
         cell = Math.floor((y*this.width + x)/this.cs);
         bit = (y*this.width+x)-cell*this.cs;
@@ -118,9 +123,9 @@
         this.scaleY = Math.floor(this.canvas.height / this.height);
         
         // Colors
-	this.ncolors = config.colors;
+        this.ncolors = config.colors;
         this.colors = []
-	for(var i=0;i<this.ncolors;i++){
+        for(var i=0;i<this.ncolors;i++){
           a1 = R(256);
           a2 = R(256);
           if(config.density<100) {
@@ -129,7 +134,7 @@
             a3 = R(100);
           }
           this.colors[i] = shuffleArray([a1,a2,a3]);
-	}
+        }
         if(this.ncolors==1) { this.colors[1]=this.colors[0]; }
 
         // Density
@@ -154,19 +159,19 @@
           this.coloredCells[i] = 0;
         }
 
-	this.seeds = config.seeds;
-	for( var i = 0; i < this.seeds; i++ ) {
-	    var x, y;
-	    do {
-	      x = 2 + R(this.width - 2);
-	      y = 2 + R(this.height - 2);
-	    } while( this.getPixel(x, y));
+        this.seeds = config.seeds;
+        for( var i = 0; i < this.seeds; i++ ) {
+          var x, y;
+          do {
+            x = 2 + R(this.width - 2);
+            y = 2 + R(this.height - 2);
+          } while( this.getPixel(x, y));
 
-	    this.setPixel((x-1), (y-1)); this.setPixel(x, (y-1)); this.setPixel((x+1), (y-1));
-	    this.setPixel((x-1),  y   ); this.setAlive(x, y    ); this.setPixel((x+1),  y   );
-	    this.setPixel((x-1), (y+1)); this.setPixel(x, (y+1)); this.setPixel((x+1), (y+1));
-            this.drawPixel(x,y);
-	}
+          this.setPixel((x-1), (y-1)); this.setPixel(x, (y-1)); this.setPixel((x+1), (y-1));
+          this.setPixel((x-1),  y   ); this.setAlive(x, y    ); this.setPixel((x+1),  y   );
+          this.setPixel((x-1), (y+1)); this.setPixel(x, (y+1)); this.setPixel((x+1), (y+1));
+          this.drawPixel(x,y);
+        }
 
       }
 
@@ -190,14 +195,18 @@
       var t = 0.0;
       var m = 1;
 
+      // Used for track FPS
       var lastLoop = new Date;
+
+      // Runs 30 times a second
       var runner = function() {
 
         var thisLoop = new Date;
         hack.fps = 1000 / (thisLoop - lastLoop);
-	getController(gui, hack, "fps").updateDisplay();
+        getController(gui, hack, "fps").updateDisplay();
         lastLoop = thisLoop;
 
+        // Finished
         if(hack.drawn >= hack.maxwalkers) {
           clearInterval(hack.interval);
           hack.timeout = setTimeout(start,hack.config.linger*1000);
@@ -248,12 +257,12 @@
                     break;
               }
             } while(0);
-
           }
         }
-
       }
 
+
+      // Options configurable through dat.GUI
       var options = {
         canvasId: 'myCanvas',
         pixel: 3,
@@ -266,30 +275,33 @@
 
 
       function blockEvent(event) {
-	event.stopPropagation();
+        event.stopPropagation();
       }
 
 
       // Code to grab FPS slider
-      function getController(gui, object, property)
-      {
-	for (var i = 0; i < gui.__controllers.length; i++)
-	{
-	  var controller = gui.__controllers[i];
-	  if (controller.object == object && controller.property == property)
-	    return controller;
-	}
-	return null;
+      function getController(gui, object, property) {
+        for (var i = 0; i < gui.__controllers.length; i++)
+        {
+          var controller = gui.__controllers[i];
+          if (controller.object == object && controller.property == property)
+            return controller;
+        }
+        return null;
       }
 
 
+      // Button to go to source
       Hack.prototype.source = function() {    
        window.location.href = 'https://github.com/***REMOVED***/XScreenSaver.js';    
-      }   
+      }
+
+      // Button to go to 404 page
       Hack.prototype.goto404 = function() {   
         window.location.href = '/404';    
       }
 
+      // onLoad setup
       var hack;
       var gui;
       window.onload = function() {
@@ -302,15 +314,16 @@
         gui.add(options, 'linger', 0, 10).step(1).name("Linger (s)");
         gui.add(hack, 'restart').name('Restart');
         var fps_slider = gui.add(hack, 'fps', 0,100).name("FPS");
-	fps_slider.domElement.style.pointerEvents = "none"
-	fps_slider.domElement.children[1].children[0].style.background = "none";
-	fps_slider.domElement.children[1].children[0].style.borderRight = "2px solid #2fa1d6";
+        fps_slider.domElement.style.pointerEvents = "none"
+        fps_slider.domElement.children[1].children[0].style.background = "none";
+        fps_slider.domElement.children[1].children[0].style.borderRight = "2px solid #2fa1d6";
 
-	getController(gui, hack, "fps").disabled = true;
+        getController(gui, hack, "fps").disabled = true;
         
         gui.add(hack, 'source').name('See source code');    
         gui.add(hack, 'goto404').name('Coral 404');
 
+        // Using setTimout with 0ms avoids problems
         setTimeout(start(),0);
       };
 
@@ -319,8 +332,6 @@
         hack.configure();
         hack.interval = setInterval(runner,33);
       }
-
-
 
     </script>
   </body>
