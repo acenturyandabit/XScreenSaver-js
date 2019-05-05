@@ -1,4 +1,4 @@
-///////annihilation-pairs/////
+///////abstracttile/////
 //How to use:
 /*
 If using all the animations, and you want to quickly start them all based on the default settings:
@@ -30,11 +30,9 @@ if (!xScreenSavers) {
 }
 
 (() => {
-    xScreenSavers.screensavers['annipairs'] = (selector, _settings) => {
-        let annipair = [];
+    xScreenSavers.screensavers['template'] = (selector, _settings) => {
+        let active = [];
         let settings = {
-            r: 2,
-            bitprob: 0.5,
             root: document
         }
         Object.assign(settings, _settings);
@@ -45,7 +43,7 @@ if (!xScreenSavers) {
             _e.append(e);
             e.width = _e.clientWidth;
             e.height = _e.clientHeight;
-            annipair.push({
+            active.push({
                 data: {
                     bits: []
                 },
@@ -55,8 +53,8 @@ if (!xScreenSavers) {
             });
         }
         setInterval(() => {
-            annipair.forEach((v, i) => {
-                //Generate bit
+            active.forEach((v, i) => {
+                //Generate new elements
                 if (Math.random() > (1 - settings.bitprob) * Math.min((v.data.bits.length - 5) / 5, 1)) {
                     v.data.bits.push({
                         cx: v.w * 0.2 + Math.random() * v.w * 0.8,
@@ -68,34 +66,11 @@ if (!xScreenSavers) {
                 //clear screen
                 v.ctx.fillStyle = "rgba(0,0,0,0.3)";
                 v.ctx.fillRect(0, 0, v.w, v.h);
-                //update and draw all bits
+                //update and draw all existing elements
 
                 for (i = 0; i < v.data.bits.length; i++) {
-                    if (v.data.bits[i].dist > 0) {
-                        v.ctx.fillStyle = "rgb(0,100,0)";
-                        v.ctx.fillRect(v.data.bits[i].cx - settings.r + v.data.bits[
-                                i].dist, v.data.bits[i].cy - settings.r,
-                            2 * settings.r, 2 * settings.r);
-                        v.ctx.fillRect(v.data.bits[i].cx - settings.r - v.data.bits[
-                                i].dist, v.data.bits[i].cy - settings.r,
-                            2 * settings.r, 2 * settings.r);
-                        v.data.bits[i].dist = v.w - (v.w - v.data.bits[i].dist) * 1.02 - 1;
-                    }
-                    if (v.data.bits[i].dist <= 0) {
-                        v.ctx.fillStyle = "rgb(0,255,0)";
-                        if (!v.data.bits[i].dead) {
-                            v.data.bits[i].dead = true;
-                            v.data.bits[i].dist = -1;
-                        }
-                        v.ctx.fillRect(v.data.bits[i].cx + v.data.bits[
-                                i].dist / 2, v.data.bits[i].cy + v
-                            .data
-                            .bits[i].dist / 2, -v.data.bits[i].dist, -v.data.bits[i].dist
-                        );
-                        v.data.bits[i].dist--;
-
-                    }
                 }
+                //remove old elements
                 while (v.data.bits.length && v.data.bits[0].dist < -10)
                     v.data.bits.shift();
             })

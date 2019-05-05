@@ -1,22 +1,17 @@
 <html>
+<!--TODO:
+-- Add back dat.gui into functions
+-- Add github repo and issues link
+-- Add queryhandler to show one specific animation only
 
+
+
+-->
 <head>
     <script src="src/annipairs.js"></script>
-
-    <script src="hackertext.js"></script>
-    <script src="radar.js"></script>
-    <script src="bitstream.js"></script>
-    <script src="triflow.js"></script>
-
-    <script src="matrixtext.js"></script>
-    <script src="kaleidocore.js"></script>
-    <script src="orbit3d.js"></script>
-    <script src="starscape.js"></script>
-    <script src="lockcore.js"></script>
-    <script>
-        xScreenSavers.start();
-    </script>
-    <!--<script src="barcharts.js"></script>-->
+    <script src="src/bitstream.js"></script>
+    <script src="src/coral.js"></script>
+    <script src="src/rorschach.js"></script>
     <style>
         body {
             background-color: black;
@@ -43,61 +38,63 @@
         }
 
         .fullScreen {
-            transition: all 1s;
             border: none;
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            display:flex;
+            justify-content: center;
+            flex-direction: row
+        }
+
+        @keyframes zoomup{
+            from{
+                height:10%;
+            } 
+            to{
+                height: 100%
+            }
         }
 
         .fullScreen>canvas {
-            transition: all 1s;
+            animation-name:zoomup;
+            animation-duration: 0.3s;
             max-width: 100%;
             height: 100%;
             margin: auto;
+            left:50%;
+            flex:0 0 auto;
         }
     </style>
-    <script>
-        //if any of the sections are clicked, toggle between fullscreen.
-        $(() => {
-            $("section").on("click", (e) => {
-                (e.currentTarget.classList.toggle("fullScreen"));
-            })
-        })
-    </script>
 </head>
 
 <body>
-    <section class='hackertext'>
-    </section>
-    <section class="radar">
-    </section>
-    <section class="kaleidocore">
-    </section>
-
-    <section class="bitstream">
-
-    </section>
-    <section class="triflow">
-
-    </section>
     <section class="annipairs">
 
     </section>
-    <section class="matrixtext">
+    <section class="coral">
 
     </section>
-    <section class="orbit3d">
+    <section class="rorschach">
 
     </section>
-    <section class="starscape">
-
-    </section>
-    <section class="lockcore">
-
-    </section>
+    <script>
+        document.addEventListener("DOMContentLoaded",()=>{
+            xScreenSavers.start();
+            document.addEventListener("click",(e)=>{
+                let t=e.target;
+                while (t!=document.body){
+                    t=t.parentElement;
+                    if (t.matches("section")){
+                        t.classList.toggle("fullScreen");
+                        break;
+                    }
+                }
+            })
+        });
+    </script>
 </body>
 
 </html>
